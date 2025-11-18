@@ -7,47 +7,30 @@
 
 # you will need to install these packages first, using the following
 # if you've already installed them, skip this step
-#install.packages('dplyr')
-#install.packages('tibble')
-#install.packages('tidyr')
-#install.packages('purrr')
-#install.packages('readr')
-#install.packages('stringr')
-#install.packages('jsonlite')
-#install.packages('lubridate')
-#install.packages('ggplot2')
-#install.packages('httr')
-#install.packages('forcats')
-#install.packages('rorcid')
-#install.packages('usethis')
-#install.packages('anytime')
-#install.packages('janitor')
-#install.packages('glue')
-#install.packages('remotes')
-#remotes::install_github("ropensci/rcrossref")
-#install.packages('roadoi')
-#install.packages('inops')
-#install.packages("rdatacite")
-#install.packages("data.table")
-#devtools::install_github("ropensci/geonames")
+#install.packages('tidyverse')
+# install.packages('jsonlite')
+# install.packages('httr')
+# install.packages('rorcid')
+# install.packages('usethis')
+# install.packages('anytime')
+# install.packages('janitor')
+# install.packages('glue')
+# install.packages('rcrossref')
+# install.packages('roadoi')
+# install.packages('inops')
+# install.packages("rdatacite")
+# install.packages("data.table")
+# install.packages("geonames")
 
 # load the packages
-library(dplyr)
-library(tibble)
-library(tidyr)
-library(purrr)
-library(readr)
-library(stringr)
+library(tidyverse)
 library(jsonlite)
-library(lubridate)
-library(ggplot2)
-library(httr)
-library(forcats)
-library(usethis)
+library(httr) #POST, content
+library(usethis) #edit_r_environ (do not need ::)
 library(anytime)
 library(janitor)
 library(glue)
-library(rorcid)
+library(rorcid) #orcid_auth (do not need ::)
 library(rcrossref)
 library(roadoi)
 library(inops)
@@ -57,7 +40,7 @@ library(geonames)
 
 
 # remove all objects from the environment to start with a clean slate
-rm(list = ls())
+#rm(list = ls())
 
 # Set up orcid / crossref in R environment ------------------------------------------------------------
 
@@ -74,10 +57,10 @@ rm(list = ls())
 # 8. Make sure to leave the quotation marks (e.g. orcid_client_id <- "APP-FDFJKDSLF320SDFF" and orcid_client_secret <- "c8e987sa-0b9c-82ed-91as-1112b24234e"). 
 
 # copy/paste your client ID from https://orcid.org/developer-tools
-orcid_client_id <- "PASTE MY CLIENT ID HERE"
+orcid_client_id <- "APP-19KPT2R94CO4RHN7"
 
 # copy/paste your client secret from https://orcid.org/developer-tools
-orcid_client_secret <- "PASTE MY CLIENT SECRET HERE"
+orcid_client_secret <- "2efde865-5160-4706-9d42-af21efa93a39"
 
 # This gets a /read-public scope access token
 orcid_request <- POST(url  = "https://orcid.org/oauth/token",
@@ -99,7 +82,7 @@ print(orcid_response$access_token)
 # Copy that string to the clipboard 
 # so we can  save the token to our R environment
 # Run this code:
-usethis::edit_r_environ()
+edit_r_environ()
 
 # A new window will open in RStudio.
 # In this separate R environment page, type the following (except the pound sign):
@@ -117,44 +100,44 @@ usethis::edit_r_environ()
 # You will now need to rerun all the packages ("library()" commands) above, then return to this line.
 
 #You can confirm this worked by calling orcid_auth(), and it will print the token
-rorcid::orcid_auth()
+orcid_auth()
 
 # set some variables   ----------------------------------------------------------------------------
 
 # set the working directory where this script is
 # a folder called "data" is also expected to be in this directory
-setwd("PASTE YOUR WORKING DIRECTORY HERE")
+#setwd("PASTE YOUR WORKING DIRECTORY HERE")
 
 # set the time period of interest: this script will compile collaboration data since Jan 1 of this year.
 # replace the YYYY with a 4 digit year.
 # the more years of data desired, the longer some portions of this script will take to run
-my_year = YYYY;
+my_year = 2020;
 
 # set the home institution identifiers
-ringgold_id <- "enter your institution's ringgold" 
-grid_id <- "enter your institution's grid ID" 
-ror_id <- "enter your institution's ROR ID"
+ringgold_id <- "7017" 
+grid_id <- "grid.260288.6" 
+ror_id <- "https://ror.org/03grc6f14"
 # leave the @ off the email domain, if you want to catch subdomains (e.g. @tuj.temple.edu)
-email_domain <- "enter your institution's email domain" 
-organization_name <- "enter your organization's name"
+email_domain <- "@mta.ca" 
+organization_name <- "Mount Allison University"
 
 # Set a short name key word here that you will use to filter for ORCID records from the home institution later
 # Keep it short, like the state name (e.g. Oklahoma). (For Temple University, used "Temple")
 # If you are adding more than one keyword, separate them by a pipe (|)
-my_org_keyword = "enter your institution's keyword"
+my_org_keyword = "Mount Allison"
 
 # set the institution's main location information (for use when precise location info is blank)
-anchor_org<-"enter your institution's name"
-anchor_city<-"enter your institution's city"
-anchor_region<-"enter your institution's state"
-anchor_country<-"enter your institution's country"
+anchor_org<-"Mount Allison University"
+anchor_city<-"Sackville"
+anchor_region<-"New Brunswick"
+anchor_country<-"Canada"
 
 # set up GeoNames in R Environment ------------------------------------------------------------
 
 # define GeoNames username and use the institution's location information for geocoding.
 # these variables will be used to derive latitude and longitude.
 # ensure free web services are enabled for your account, go here to enable [(https://www.geonames.org/manageaccount)]
-options(geonamesUsername = "PASTE GEONAMES USERNAME HERE")
+options(geonamesUsername = "estregger")
 home_city <- anchor_city
 home_country <- anchor_country
 
@@ -164,42 +147,56 @@ home_country <- anchor_country
 # decide between these two choices:
 # 1. to construct a simple query with the ringgold, grid, ROR ids, email domain, an organization name set above
 # run this:
-my_query <- glue('ringgold-org-id:', ringgold_id, 
-                 ' OR grid-org-id:', grid_id, 
-                 ' OR ror-org-id:"', ror_id, 
-                 '" OR email:*', email_domain, 
-                 ' OR affiliation-org-name:"', organization_name, '"')
+# my_query <- glue('ringgold-org-id:', ringgold_id, 
+#                   ' OR grid-org-id:', grid_id, 
+#                   ' OR ror-org-id:"', ror_id, 
+#                   '" OR email:*', email_domain, 
+#                   ' OR affiliation-org-name:"', organization_name, '"')
+
+#ES: use str_glue instead of glue, reduce number of packages by 1
+my_query <- str_glue('ringgold-org-id:{ringgold_id}
+                      OR grid-org-id:{grid_id}
+                      OR ror-org-id:"{ror_id}"
+                      OR email:*{email_domain}
+                      OR affiliation-org-name:"{organization_name}"')
+
+test_collab <- orcid_doi(dois = "10.3998/weaveux.222")
 
 # OR 2. to customize a more complicated query with multiple ringgold, grid, ROR ids, email domains, or organization names
 # specify which data you want to pull following this example.
 # keep in mind that ROR ID and organization name are strings and need double quotes inside the 
 # single quotes used here for concatenation
 # replace these  example lines from Temple University carefully with ones you are interested in 
-my_query <- glue('ringgold-org-id:', '6558', 
-                 ' OR ringgold-org-id:', '43297',
-                 ' OR ringgold-org-id:', '83908',
-                 ' OR grid-org-id:', 'grid.264727.2', 
-                 ' OR grid-org-id:', 'grid.469246.b', 
-                 ' OR grid-org-id:', 'grid.460938.0', 
-                 ' OR ror-org-id:"', 'https://ror.org/00kx1jb78', 
-                 '" OR ror-org-id:"', 'https://ror.org/04zzmzt85',
-                 '" OR ror-org-id:"', 'https://ror.org/03savr706', 
-                 '" OR email:*', '@temple.edu', 
-                 ' OR email:*', '@tuj.temple.edu', 
-                 ' OR affiliation-org-name:"', 'Temple University',
-                 '" OR affiliation-org-name:"', 'Temple Ambler',
-                 '" OR affiliation-org-name:"', 'Temple Japan', '"')
+# my_query <- glue('ringgold-org-id:', '6558', 
+#                   ' OR ringgold-org-id:', '43297',
+#                   ' OR ringgold-org-id:', '83908',
+#                   ' OR grid-org-id:', 'grid.264727.2', 
+#                   ' OR grid-org-id:', 'grid.469246.b', 
+#                   ' OR grid-org-id:', 'grid.460938.0', 
+#                   ' OR ror-org-id:"', 'https://ror.org/00kx1jb78', 
+#                   '" OR ror-org-id:"', 'https://ror.org/04zzmzt85',
+#                   '" OR ror-org-id:"', 'https://ror.org/03savr706', 
+#                   '" OR email:*', '@temple.edu', 
+#                   ' OR email:*', '@tuj.temple.edu', 
+#                   ' OR affiliation-org-name:"', 'Temple University',
+#                   '" OR affiliation-org-name:"', 'Temple Ambler',
+#                   '" OR affiliation-org-name:"', 'Temple Japan', '"')
 
 # get the counts
 ##### TIME: this may hang a bit if institution has many ORCID ID holders(e.g. for Temple University's data [~3500 IDs], this took a few seconds)
-orcid_count <- base::attr(rorcid::orcid(query = my_query),
+
+#can delete base:: and rorcid:: from this section
+orcid_count <- attr(orcid(query = my_query),
                           "found")
 
 # create the page vector
+# why do we need a page vector? test if this simpler approach would work with a larger data set using Temple data. Result: No. Get a bad request response. Rows parameter must be an integer between 0 and 1,000). Add explanation that this section uses map to request 200 ORCID iDs at a time.
+# my_orcids_data <- orcid(query = my_query, rows = orcid_count)
+
 my_pages <- seq(from = 0, to = orcid_count, by = 200)
 
 # get the ORCID iDs
-my_orcids <- purrr::map(
+my_orcids <- map(
   my_pages,
   function(page) {
     print(page)
@@ -213,9 +210,13 @@ my_orcids <- purrr::map(
 my_orcids_data <- my_orcids %>%
   map_dfr(., as_tibble) %>%
   janitor::clean_names()
+# 
+# 
+# 
+# View(my_orcids_data_2)
 
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(my_orcids_data, "./data/my_orcids_data.csv")
+write_csv(my_orcids_data, "./data/my_orcids_data.csv")
 
 # read it back in, if necessary
 #my_orcids_data <- read_csv("./data/my_orcids_data.csv", col_types = cols(.default = "c"))
@@ -226,11 +227,11 @@ my_orcids_data <- my_orcids %>%
 
 # get the employments from the orcid_identifier_path column
 ##### TIME: be patient, this may take a long time (e.g. for Temple University's data [~3500 IDs], this took ~8 minutes)
-my_employment <- rorcid::orcid_employments(my_orcids_data$orcid_identifier_path)
+my_employment <- orcid_employments(my_orcids_data$orcid_identifier_path)
 
 ##### WRITE/READ JSON uncomment to work with this data outside of R or read it back in later
-#to_write<-toJSON(my_employment, na="null")
-#write(to_write,"./data/employment.json")
+to_write<-toJSON(my_employment, na="null")
+write(to_write,"./data/employment.json")
 
 # read it back in, if necessary
 #my_employment <- read_json("./data/processed/employment.json", simplifyVector = TRUE)
@@ -241,8 +242,9 @@ my_employment_data <- my_employment %>%
   purrr::map(., purrr::pluck, "affiliation-group", "summaries") %>% 
   purrr::flatten_dfr() %>%
   janitor::clean_names() %>%
-  dplyr::mutate(employment_summary_end_date = anytime::anydate(employment_summary_end_date/1000),
-                employment_summary_created_date_value = anytime::anydate(employment_summary_created_date_value/1000),
+  dplyr::mutate(employment_summary_end_date = anydate(employment_summary_end_date/1000),
+
+          employment_summary_created_date_value = anytime::anydate(employment_summary_created_date_value/1000),
                 employment_summary_last_modified_date_value = anytime::anydate(employment_summary_last_modified_date_value/1000))
 
 # clean up the column names
@@ -287,8 +289,8 @@ my_employment_data_filtered <- my_employment_data %>%
 #              organization_name == "University of New Brunswick - Saint John" )
 
 # OR 3. to accept any organization that contains anchor_org in my_organization_filtered:
-my_employment_data_filtered <- my_employment_data %>%
-  dplyr::filter(str_detect(organization_name, anchor_org))
+# my_employment_data_filtered <- my_employment_data %>%
+#  dplyr::filter(str_detect(organization_name, anchor_org))
 
 # finally, filter to include only people who have NA as the end date
 my_employment_data_filtered_current <- my_employment_data_filtered %>%
@@ -337,31 +339,31 @@ unique_orcids <- unique(current_employment_all$orcid_identifier) %>%
 
 # then run the following expression to get all biographical information for those iDs.
 ##### TIME: This may take anywhere from a few seconds to a few minutes (e.g. for Temple University's data [~700 IDs], this took ~1.5 minutes)
-my_orcid_person <- rorcid::orcid_person(unique_orcids)
+#my_orcid_person <- rorcid::orcid_person(unique_orcids)
 
 # then we construct a data frame from the response. 
 # See more at https://ciakovx.github.io/rorcid.html#Getting_the_data_into_a_data_frame for this.
-my_orcid_person_data <- my_orcid_person %>% {
-  dplyr::tibble(
-    given_name = purrr::map_chr(., purrr::pluck, "name", "given-names", "value", .default=NA_character_),
-    created_date = purrr::map_chr(., purrr::pluck, "name", "created-date", "value", .default=NA_integer_),
-    last_modified_date = purrr::map_chr(., purrr::pluck, "name", "created-date", "value", .default=NA_character_),
-    family_name = purrr::map_chr(., purrr::pluck, "name", "family-name", "value", .default=NA_character_),
-    credit_name = purrr::map_chr(., purrr::pluck, "name", "credit-name", "value", .default=NA_character_),
-    other_names = purrr::map(., purrr::pluck, "other-names", "other-name", "content", .default=NA_character_),
-    orcid_identifier_path = purrr::map_chr(., purrr::pluck, "name", "path", .default = NA_character_),
-    biography = purrr::map_chr(., purrr::pluck, "biography", "content", .default=NA_character_),
-    researcher_urls = purrr::map(., purrr::pluck, "researcher-urls", "researcher-url", .default=NA_character_),
-    emails = purrr::map(., purrr::pluck, "emails", "email", "email", .default=NA_character_),
-    keywords = purrr::map(., purrr::pluck, "keywords", "keyword", "content", .default=NA_character_),
-    external_ids = purrr::map(., purrr::pluck, "external-identifiers", "external-identifier", .default=NA_character_))
-} %>%
-  dplyr::mutate(created_date = anytime::anydate(as.double(created_date)/1000),
-                last_modified_date = anytime::anydate(as.double(last_modified_date)/1000))
-
-# Join it back with the employment records so that the employment data now includes organization city, region, country
-orcid_person_employment_join <- my_orcid_person_data %>%
-  left_join(current_employment_all, by = c("orcid_identifier_path" = "orcid_identifier"))
+#my_orcid_person_data <- my_orcid_person %>% {
+#   dplyr::tibble(
+#     given_name = purrr::map_chr(., purrr::pluck, "name", "given-names", "value", .default=NA_character_),
+#     created_date = purrr::map_chr(., purrr::pluck, "name", "created-date", "value", .default=NA_integer_),
+#     last_modified_date = purrr::map_chr(., purrr::pluck, "name", "created-date", "value", .default=NA_character_),
+#     family_name = purrr::map_chr(., purrr::pluck, "name", "family-name", "value", .default=NA_character_),
+#     credit_name = purrr::map_chr(., purrr::pluck, "name", "credit-name", "value", .default=NA_character_),
+#     other_names = purrr::map(., purrr::pluck, "other-names", "other-name", "content", .default=NA_character_),
+#     orcid_identifier_path = purrr::map_chr(., purrr::pluck, "name", "path", .default = NA_character_),
+#     biography = purrr::map_chr(., purrr::pluck, "biography", "content", .default=NA_character_),
+#     researcher_urls = purrr::map(., purrr::pluck, "researcher-urls", "researcher-url", .default=NA_character_),
+#     emails = purrr::map(., purrr::pluck, "emails", "email", "email", .default=NA_character_),
+#     keywords = purrr::map(., purrr::pluck, "keywords", "keyword", "content", .default=NA_character_),
+#     external_ids = purrr::map(., purrr::pluck, "external-identifiers", "external-identifier", .default=NA_character_))
+# } %>%
+#   dplyr::mutate(created_date = anytime::anydate(as.double(created_date)/1000),
+#                 last_modified_date = anytime::anydate(as.double(last_modified_date)/1000))
+# 
+# # Join it back with the employment records so that the employment data now includes organization city, region, country
+# orcid_person_employment_join <- my_orcid_person_data %>%
+#   left_join(current_employment_all, by = c("orcid_identifier_path" = "orcid_identifier"))
 
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
 #write_csv(orcid_person_employment_join, "./data/orcid_employment_file.csv")
@@ -370,14 +372,21 @@ orcid_person_employment_join <- my_orcid_person_data %>%
 #orcid_person_employment_join <- read_csv("./data/orcid_employment_file.csv", col_types = cols(.default = "c"))
 ##### WRITE/READ CSV
 
+View(orcid_person_employment_join)
 
 # get works data -----------------------------------------------------
 
 # create a vector of unique, unduplicated ORCID IDs from that file
-my_orcids <- orcid_person_employment_join %>%
-  filter(!duplicated(orcid_identifier_path)) %>%
-  pull(orcid_identifier_path) %>%
-  na.omit() %>%
+# my_orcids <- orcid_person_employment_join %>%
+#   filter(!duplicated(orcid_identifier_path)) %>%
+#   pull(orcid_identifier_path) %>%
+#   na.omit() %>%
+#   as.character()
+
+my_orcids <- current_employment_all |> 
+  filter(!duplicated(orcid_identifier)) |> 
+  pull(orcid_identifier) |> 
+  na.omit() |> 
   as.character()
 
 # Call the orcid_works function to collect all works associated with each ID
@@ -385,8 +394,8 @@ my_orcids <- orcid_person_employment_join %>%
 my_works <- rorcid::orcid_works(my_orcids)
 
 ##### WRITE/READ JSON uncomment to work with this data outside of R or read it back in later
-#to_write<-toJSON(my_works, na="null")
-#write(to_write,"./data/my_works.json")
+to_write<-toJSON(my_works, na="null")
+write(to_write,"./data/my_works.json")
 
 # read it back in, if necessary
 #my_works <- read_json("./data/my_works.json", simplifyVector = TRUE)
@@ -410,6 +419,12 @@ my_works_externalIDs <- my_works_data %>%
   dplyr::filter(!purrr::map_lgl(external_ids_external_id, purrr::is_empty)) %>% 
   tidyr::unnest(external_ids_external_id) %>%
   clean_names()
+
+my_content_types <- my_works_externalIDs %>%
+  group_by(external_id_type) %>%
+  count() %>%
+  arrange(desc(n))
+
 
 # From those unnested external IDs, we want to keep only those with a DOI, as that is the 
 # value we'll use to look up the items in Crossref.
@@ -449,7 +464,7 @@ dois_unduped <- dois %>%
   left_join(orcid_empl_merge, by = "orcid_identifier")
 
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(dois_unduped, "./data/orcid_dois.csv")
+write_csv(dois_unduped, "./data/orcid_dois.csv")
 
 # read it back in, if necessary
 #dois_unduped <- read_csv("./data/orcid_dois.csv")
@@ -481,9 +496,9 @@ dois_since_year <- dois_unduped %>%
 
 
 ##### WRITE/READ JSON uncomment to work with this data outside of R or read it back in later
-#write_file_path = paste0("./data/metadata_",my_year,".json")
-#to_write<-toJSON(metadata_since_year, pretty=TRUE, na="null")
-#write(to_write,write_file_path)
+write_file_path = paste0("./data/metadata_",my_year,".json")
+to_write<-toJSON(metadata_since_year, pretty=TRUE, na="null")
+write(to_write,write_file_path)
 
 # read it back in, if necessary
 #metadata_since_year <- read_json(write_file_path, simplifyVector = TRUE)
@@ -777,6 +792,23 @@ authlist_nodups <- subset(authlist_nodups, (anchorfullname != coauthfullname))
 # when there are author name variations that we are not aware of, and there is no ORCID ID
 # there is just no way to resolve them, so the occasional row where home author and co-author are the same will persist 
 
+###### ES CODE IMPROVEMENT ######
+# no location data or ORCID for co-author
+# go the other way from DOI
+# so steps:
+# get MTA related ORCIDS
+# filter by current employment
+# get works by current employees
+# filter to works with DOIs
+# retrieve Crossref and Datacite data
+# look up ORCID records for DOIs
+# get biographical info for DOIs
+# join on 
+
+orcid('digital-object-ids:"10.21083/partnership.v16i2.6692"')
+
+
+
 ##### Code improvement
 # there are many times when we could try to fill in info from the author ORCID ID reference table
 # in order to keep refining the data. so it would be good to take this code out and
@@ -829,10 +861,12 @@ authlist_nodups <- subset(my_join, select = -c(orcid_identifier_path,department_
 
 # we eventually want to output a CSV with these columns:
 # fname1, lname1, orcid1, affiliation1, org1, city1, region1, country1, fname2, lname2, orcid2, affiliation2, org2, city2, region2, country2, DOI
+# COULD ADDING TITLE here get the title column into the final data output file and resolve Shiny map problem
 
 # create a dataframe with the columns we need
 co_authors <- authlist_nodups %>%
   select(any_of(c("doi",
+                  "title"
                   "issued",
                   "given_name",
                   "family_name", 
@@ -862,6 +896,8 @@ co_authors <- co_authors %>%
     region2 = organization_address_region.x,
     country2 = organization_address_country.x
   )
+
+co_authors$orcid2 <- gsub("/", "", co_authors$orcid2)
 
 # add in columns of home author info affiliation and location info
 # join the info in from our orcid_df reference table
@@ -909,8 +945,8 @@ my_co_auths_employment <- rorcid::orcid_employments(co_auth_ids_unduped)
 
 ##### JSON
 # you can write the file to json if you want to work with it outside of R
-#to_write<-toJSON(my_co_auths_employment, na="null")
-#write(to_write,"./data/co_auths_employment.json")
+to_write<-toJSON(my_co_auths_employment, na="null")
+write(to_write,"./data/co_auths_employment.json")
 
 # read it back in, if necessary
 #my_co_auths_employment <- read_json("./data/co_auths_employment.json", simplifyVector = TRUE)
@@ -1040,7 +1076,7 @@ co_authors_full_info <- co_authors_full_info %>% select(doi:country2)
 
 # write it to a csv to be visualized
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(co_authors_full_info, "./data/orcid-data.csv")
+write_csv(co_authors_full_info, "./data/orcid-data.csv")
 
 # read it back in, if necessary
 #co_authors_full_info <- read_csv("./data/orcid-data.csv", col_types = cols(.default = "c"))
