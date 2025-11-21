@@ -26,11 +26,11 @@ library(stringr)
 library(tidyr)
 
 # Custom variables for file paths, organization, and dates
-setwd("ENTER YOUR WORKING DIRECTORY HERE")  
-file_path <- "ENTER YOUR FILE PATH HERE"    
-organization_name <- "ENTER YOUR ORGANIZATION NAME HERE"  
-start_date <- "ENTER START DATE HERE"        
-update_date <- "ENTER UPDATE DATE HERE"       
+#setwd("ENTER YOUR WORKING DIRECTORY HERE")  
+file_path <- "../data/orcid_data_latlng.csv"    
+organization_name <- "Mount Allison"  
+start_date <- "2021"        
+update_date <- "2025"       
 
 
 # Generate subtitle panel for displaying dates

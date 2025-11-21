@@ -57,104 +57,104 @@ library(geonames)
 
 
 # remove all objects from the environment to start with a clean slate
-rm(list = ls())
+#rm(list = ls())
 
-# Set up orcid / crossref in R environment ------------------------------------------------------------
-
-# if you've already done these steps and set up your bearer token in RStudio
-# you can skip to the next section: "set some variables"
-
-# 1. If you haven’t done so already, create an ORCID account at https://orcid.org/signin. 
-# 2. In the upper right corner, click your name, then in the drop-down menu, click Developer Tools. Note: In order to access Developer Tools, you must verify your email address. 
-# 3. If you have not already verified your email address, you will be prompted to do so at this point.
-# 4. Click the “Register for the free ORCID public API” button
-# 5. Review and agree to the terms of service when prompted.
-# 6. Add your name in the Name field, https://www.orcid.org in the Your Website URL field, “Getting public API key” in Description field, and https://www.orcid.org in the redirect URI field. Click the diskette button to save.
-# 7. A gray box will appear including your Client ID and Client Secret. In the below code chunk, copy and paste the client ID and the client secret respectively. 
-# 8. Make sure to leave the quotation marks (e.g. orcid_client_id <- "APP-FDFJKDSLF320SDFF" and orcid_client_secret <- "c8e987sa-0b9c-82ed-91as-1112b24234e"). 
-
-# copy/paste your client ID from https://orcid.org/developer-tools
-orcid_client_id <- "PASTE MY CLIENT ID HERE"
-
-# copy/paste your client secret from https://orcid.org/developer-tools
-orcid_client_secret <- "PASTE MY CLIENT SECRET HERE"
-
-# This gets a /read-public scope access token
-orcid_request <- POST(url  = "https://orcid.org/oauth/token",
-                      config = add_headers(`Accept` = "application/json",
-                                           `Content-Type` = "application/x-www-form-urlencoded"),
-                      body = list(grant_type = "client_credentials",
-                                  scope = "/read-public",
-                                  client_id = orcid_client_id,
-                                  client_secret = orcid_client_secret),
-                      encode = "form")
-
-# parse the API request with content
-orcid_response <- content(orcid_request)
-
-# run the following code
-print(orcid_response$access_token)
-
-#You will see a string of text print out in your R console.
-# Copy that string to the clipboard 
-# so we can  save the token to our R environment
-# Run this code:
-usethis::edit_r_environ()
-
-# A new window will open in RStudio.
-# In this separate R environment page, type the following (except the pound sign):
-# ORCID_TOKEN="my-token"
-# replace 'my-token' with the access_token you just copied. 
-# Then press enter to create a new line.
-# while we are here, we'll add in our rcrossref credentials
-# type crossref_email="name@example.com", using your own email address.
-# press enter to create a new line, and leave it blank. 
-# Press Ctrl + S (Mac: Cmd + S) to save this information to your R environment and close the window. 
-# You won't see anything happen here because it is just saving the page.
-
-# Click Session > Restart R. Your token should now be saved to your R environment. 
-
-# You will now need to rerun all the packages ("library()" commands) above, then return to this line.
-
-#You can confirm this worked by calling orcid_auth(), and it will print the token
-rorcid::orcid_auth()
+# # Set up orcid / crossref in R environment ------------------------------------------------------------
+# 
+# # if you've already done these steps and set up your bearer token in RStudio
+# # you can skip to the next section: "set some variables"
+# 
+# # 1. If you haven’t done so already, create an ORCID account at https://orcid.org/signin.
+# # 2. In the upper right corner, click your name, then in the drop-down menu, click Developer Tools. Note: In order to access Developer Tools, you must verify your email address.
+# # 3. If you have not already verified your email address, you will be prompted to do so at this point.
+# # 4. Click the “Register for the free ORCID public API” button
+# # 5. Review and agree to the terms of service when prompted.
+# # 6. Add your name in the Name field, https://www.orcid.org in the Your Website URL field, “Getting public API key” in Description field, and https://www.orcid.org in the redirect URI field. Click the diskette button to save.
+# # 7. A gray box will appear including your Client ID and Client Secret. In the below code chunk, copy and paste the client ID and the client secret respectively.
+# # 8. Make sure to leave the quotation marks (e.g. orcid_client_id <- "APP-FDFJKDSLF320SDFF" and orcid_client_secret <- "c8e987sa-0b9c-82ed-91as-1112b24234e").
+# 
+# # copy/paste your client ID from https://orcid.org/developer-tools
+# #orcid_client_id <- "PASTE MY CLIENT ID HERE"
+# 
+# # copy/paste your client secret from https://orcid.org/developer-tools
+# #orcid_client_secret <- "PASTE MY CLIENT SECRET HERE"
+# 
+# # This gets a /read-public scope access token
+# #orcid_request <- POST(url  = "https://orcid.org/oauth/token",
+#                       config = add_headers(`Accept` = "application/json",
+#                                            `Content-Type` = "application/x-www-form-urlencoded"),
+#                       body = list(grant_type = "client_credentials",
+#                                   scope = "/read-public",
+#                                   client_id = orcid_client_id,
+#                                   client_secret = orcid_client_secret),
+#                       encode = "form")
+# 
+# # parse the API request with content
+# orcid_response <- content(orcid_request)
+# 
+# # run the following code
+# print(orcid_response$access_token)
+# 
+# #You will see a string of text print out in your R console.
+# # Copy that string to the clipboard
+# # so we can  save the token to our R environment
+# # Run this code:
+# usethis::edit_r_environ()
+# 
+# # A new window will open in RStudio.
+# # In this separate R environment page, type the following (except the pound sign):
+# # ORCID_TOKEN="my-token"
+# # replace 'my-token' with the access_token you just copied.
+# # Then press enter to create a new line.
+# # while we are here, we'll add in our rcrossref credentials
+# # type crossref_email="name@example.com", using your own email address.
+# # press enter to create a new line, and leave it blank.
+# # Press Ctrl + S (Mac: Cmd + S) to save this information to your R environment and close the window.
+# # You won't see anything happen here because it is just saving the page.
+# 
+# # Click Session > Restart R. Your token should now be saved to your R environment.
+# 
+# # You will now need to rerun all the packages ("library()" commands) above, then return to this line.
+# 
+# #You can confirm this worked by calling orcid_auth(), and it will print the token
+# rorcid::orcid_auth()
 
 # set some variables   ----------------------------------------------------------------------------
 
 # set the working directory where this script is
 # a folder called "data" is also expected to be in this directory
-setwd("PASTE YOUR WORKING DIRECTORY HERE")
+#setwd("PASTE YOUR WORKING DIRECTORY HERE")
 
 # set the time period of interest: this script will compile collaboration data since Jan 1 of this year.
 # replace the YYYY with a 4 digit year.
 # the more years of data desired, the longer some portions of this script will take to run
-my_year = YYYY;
+my_year = 2021;
 
 # set the home institution identifiers
-ringgold_id <- "enter your institution's ringgold" 
-grid_id <- "enter your institution's grid ID" 
-ror_id <- "enter your institution's ROR ID"
+ringgold_id <- "7017" 
+grid_id <- "grid.260288.6" 
+ror_id <- "https://ror.org/03grc6f14"
 # leave the @ off the email domain, if you want to catch subdomains (e.g. @tuj.temple.edu)
-email_domain <- "enter your institution's email domain" 
-organization_name <- "enter your organization's name"
+email_domain <- "@mta.ca" 
+organization_name <- "Mount Allison University"
 
 # Set a short name key word here that you will use to filter for ORCID records from the home institution later
 # Keep it short, like the state name (e.g. Oklahoma). (For Temple University, used "Temple")
 # If you are adding more than one keyword, separate them by a pipe (|)
-my_org_keyword = "enter your institution's keyword"
+my_org_keyword = "Mount Allison University"
 
 # set the institution's main location information (for use when precise location info is blank)
-anchor_org<-"enter your institution's name"
-anchor_city<-"enter your institution's city"
-anchor_region<-"enter your institution's state"
-anchor_country<-"enter your institution's country"
+anchor_org<-"Mount Allison University"
+anchor_city<-"Sackville"
+anchor_region<-"New Brunswick"
+anchor_country<-"Canada"
 
 # set up GeoNames in R Environment ------------------------------------------------------------
 
 # define GeoNames username and use the institution's location information for geocoding.
 # these variables will be used to derive latitude and longitude.
 # ensure free web services are enabled for your account, go here to enable [(https://www.geonames.org/manageaccount)]
-options(geonamesUsername = "PASTE GEONAMES USERNAME HERE")
+options(geonamesUsername = "estregger")
 home_city <- anchor_city
 home_country <- anchor_country
 
@@ -175,20 +175,20 @@ my_query <- glue('ringgold-org-id:', ringgold_id,
 # keep in mind that ROR ID and organization name are strings and need double quotes inside the 
 # single quotes used here for concatenation
 # replace these  example lines from Temple University carefully with ones you are interested in 
-my_query <- glue('ringgold-org-id:', '6558', 
-                 ' OR ringgold-org-id:', '43297',
-                 ' OR ringgold-org-id:', '83908',
-                 ' OR grid-org-id:', 'grid.264727.2', 
-                 ' OR grid-org-id:', 'grid.469246.b', 
-                 ' OR grid-org-id:', 'grid.460938.0', 
-                 ' OR ror-org-id:"', 'https://ror.org/00kx1jb78', 
-                 '" OR ror-org-id:"', 'https://ror.org/04zzmzt85',
-                 '" OR ror-org-id:"', 'https://ror.org/03savr706', 
-                 '" OR email:*', '@temple.edu', 
-                 ' OR email:*', '@tuj.temple.edu', 
-                 ' OR affiliation-org-name:"', 'Temple University',
-                 '" OR affiliation-org-name:"', 'Temple Ambler',
-                 '" OR affiliation-org-name:"', 'Temple Japan', '"')
+# my_query <- glue('ringgold-org-id:', '6558', 
+#                  ' OR ringgold-org-id:', '43297',
+#                  ' OR ringgold-org-id:', '83908',
+#                  ' OR grid-org-id:', 'grid.264727.2', 
+#                  ' OR grid-org-id:', 'grid.469246.b', 
+#                  ' OR grid-org-id:', 'grid.460938.0', 
+#                  ' OR ror-org-id:"', 'https://ror.org/00kx1jb78', 
+#                  '" OR ror-org-id:"', 'https://ror.org/04zzmzt85',
+#                  '" OR ror-org-id:"', 'https://ror.org/03savr706', 
+#                  '" OR email:*', '@temple.edu', 
+#                  ' OR email:*', '@tuj.temple.edu', 
+#                  ' OR affiliation-org-name:"', 'Temple University',
+#                  '" OR affiliation-org-name:"', 'Temple Ambler',
+#                  '" OR affiliation-org-name:"', 'Temple Japan', '"')
 
 # get the counts
 ##### TIME: this may hang a bit if institution has many ORCID ID holders(e.g. for Temple University's data [~3500 IDs], this took a few seconds)
@@ -215,7 +215,7 @@ my_orcids_data <- my_orcids %>%
   janitor::clean_names()
 
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(my_orcids_data, "./data/my_orcids_data.csv")
+write_csv(my_orcids_data, "./data/my_orcids_data.csv")
 
 # read it back in, if necessary
 #my_orcids_data <- read_csv("./data/my_orcids_data.csv", col_types = cols(.default = "c"))
@@ -229,8 +229,8 @@ my_orcids_data <- my_orcids %>%
 my_employment <- rorcid::orcid_employments(my_orcids_data$orcid_identifier_path)
 
 ##### WRITE/READ JSON uncomment to work with this data outside of R or read it back in later
-#to_write<-toJSON(my_employment, na="null")
-#write(to_write,"./data/employment.json")
+to_write<-toJSON(my_employment, na="null")
+write(to_write,"./data/employment.json")
 
 # read it back in, if necessary
 #my_employment <- read_json("./data/processed/employment.json", simplifyVector = TRUE)
@@ -287,8 +287,8 @@ my_employment_data_filtered <- my_employment_data %>%
 #              organization_name == "University of New Brunswick - Saint John" )
 
 # OR 3. to accept any organization that contains anchor_org in my_organization_filtered:
-my_employment_data_filtered <- my_employment_data %>%
-  dplyr::filter(str_detect(organization_name, anchor_org))
+# my_employment_data_filtered <- my_employment_data %>%
+#   dplyr::filter(str_detect(organization_name, anchor_org))
 
 # finally, filter to include only people who have NA as the end date
 my_employment_data_filtered_current <- my_employment_data_filtered %>%
@@ -364,7 +364,7 @@ orcid_person_employment_join <- my_orcid_person_data %>%
   left_join(current_employment_all, by = c("orcid_identifier_path" = "orcid_identifier"))
 
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(orcid_person_employment_join, "./data/orcid_employment_file.csv")
+write_csv(orcid_person_employment_join, "./data/orcid_employment_file.csv")
 
 # read it back in, if necessary
 #orcid_person_employment_join <- read_csv("./data/orcid_employment_file.csv", col_types = cols(.default = "c"))
@@ -385,8 +385,8 @@ my_orcids <- orcid_person_employment_join %>%
 my_works <- rorcid::orcid_works(my_orcids)
 
 ##### WRITE/READ JSON uncomment to work with this data outside of R or read it back in later
-#to_write<-toJSON(my_works, na="null")
-#write(to_write,"./data/my_works.json")
+to_write<-toJSON(my_works, na="null")
+write(to_write,"./data/my_works.json")
 
 # read it back in, if necessary
 #my_works <- read_json("./data/my_works.json", simplifyVector = TRUE)
@@ -449,7 +449,7 @@ dois_unduped <- dois %>%
   left_join(orcid_empl_merge, by = "orcid_identifier")
 
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(dois_unduped, "./data/orcid_dois.csv")
+write_csv(dois_unduped, "./data/orcid_dois.csv")
 
 # read it back in, if necessary
 #dois_unduped <- read_csv("./data/orcid_dois.csv")
@@ -481,9 +481,9 @@ dois_since_year <- dois_unduped %>%
 
 
 ##### WRITE/READ JSON uncomment to work with this data outside of R or read it back in later
-#write_file_path = paste0("./data/metadata_",my_year,".json")
-#to_write<-toJSON(metadata_since_year, pretty=TRUE, na="null")
-#write(to_write,write_file_path)
+write_file_path = paste0("./data/metadata_",my_year,".json")
+to_write<-toJSON(metadata_since_year, pretty=TRUE, na="null")
+write(to_write,write_file_path)
 
 # read it back in, if necessary
 #metadata_since_year <- read_json(write_file_path, simplifyVector = TRUE)
@@ -749,13 +749,13 @@ authlist_all <- auths_merge %>%
 # we keep these because we're counting each home author and all their collaborations, including within institution
 
 # we do want to remove rows produced by the join where the home author (orcid_identifier) is 
-# the same as the co-author (ORCID) - so where orcid_identifier = str_sub(ORCID , 18, 37)
+# the same as the co-author (ORCID) - so where orcid_identifier = str_sub(ORCID , 19, 37)
 # AND where the home author / co-author names are exactly the same
 # this will miss slight variations in names when there is no ORCID ID on the cross ref record (e.g. Bradley Baker vs. Bradley J. Baker)
 
 # add some columns to authlist_all to help with this deduplicating
 authlist_all$orcid_coauth <- with(authlist_all, 
-                                  ifelse(is.na(ORCID),'',str_sub(ORCID, 18, 37))
+                                  ifelse(is.na(ORCID),'',str_sub(ORCID, 19, 37))
 )
 
 # fullname identifier for the home author, striped of punctuation and whitespace
@@ -833,6 +833,7 @@ authlist_nodups <- subset(my_join, select = -c(orcid_identifier_path,department_
 # create a dataframe with the columns we need
 co_authors <- authlist_nodups %>%
   select(any_of(c("doi",
+                  "title",
                   "issued",
                   "given_name",
                   "family_name", 
@@ -909,8 +910,8 @@ my_co_auths_employment <- rorcid::orcid_employments(co_auth_ids_unduped)
 
 ##### JSON
 # you can write the file to json if you want to work with it outside of R
-#to_write<-toJSON(my_co_auths_employment, na="null")
-#write(to_write,"./data/co_auths_employment.json")
+to_write<-toJSON(my_co_auths_employment, na="null")
+write(to_write,"./data/co_auths_employment.json")
 
 # read it back in, if necessary
 #my_co_auths_employment <- read_json("./data/co_auths_employment.json", simplifyVector = TRUE)
@@ -1040,7 +1041,7 @@ co_authors_full_info <- co_authors_full_info %>% select(doi:country2)
 
 # write it to a csv to be visualized
 ##### WRITE/READ CSV uncomment to save this data and read it back in later
-#write_csv(co_authors_full_info, "./data/orcid-data.csv")
+write_csv(co_authors_full_info, "./data/orcid-data.csv")
 
 # read it back in, if necessary
 #co_authors_full_info <- read_csv("./data/orcid-data.csv", col_types = cols(.default = "c"))
