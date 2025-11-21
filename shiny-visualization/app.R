@@ -26,11 +26,11 @@ library(stringr)
 library(tidyr)
 
 # Custom variables for file paths, organization, and dates
-#setwd("ENTER YOUR WORKING DIRECTORY HERE")  
-file_path <- "../data/orcid_data_latlng.csv"    
-organization_name <- "Mount Allison University"  
-start_date <- "2020-01-01"        
-update_date <- "2025-11-01"       
+setwd("ENTER YOUR WORKING DIRECTORY HERE")  
+file_path <- "ENTER YOUR FILE PATH HERE"    
+organization_name <- "ENTER YOUR ORGANIZATION NAME HERE"  
+start_date <- "ENTER START DATE HERE"        
+update_date <- "ENTER UPDATE DATE HERE"       
 
 
 # Generate subtitle panel for displaying dates
@@ -62,10 +62,6 @@ ui <- page_navbar(
     generateTitlePanel(),
     layout_columns(
       fill = FALSE,
-#add date filter / Madison K's idea. Use start_date defined above as default, end_date default needs to be update_date.
-#notes: would need to update header
-  dateInput("input_start_date", "Start date"),
-  dateInput("input_end_date", "End date"),
       value_box(
         title = "Article Collaborations",
         value = textOutput("collab_num_updated"),
@@ -138,19 +134,9 @@ server <- function(input, output, session) {
     df
   })
   
-  # 
-  # # Count unique collaborations by DOI
-  # collab_num <- reactive({
-  #   df <- data()
-  #   n <- n_distinct(df$doi) 
-  # })
-  
-  # TESTING: Count unique collaborations by DOI using input date
-# This does change the collab_num. Would need to change the rest of the outputs as well, but better to find a way to update data above for all shiny outputs.
-  
+  # Count unique collaborations by DOI
   collab_num <- reactive({
-    df <- data() |> 
-      filter(issued > input$input_start_date)
+    df <- data()
     n <- n_distinct(df$doi) 
   })
   
@@ -233,7 +219,7 @@ server <- function(input, output, session) {
     
     # Get unique locations with their associated organizations
     unique_institutions <- data() %>%
-      select(org2, city2, region2, country2, lat2, lng2) %>%
+      select(org2, city2, region2, country2, lat2, lng2, title) %>%
       filter(!is.na(lat2) & !is.na(lng2)) %>%
       group_by(lat2, lng2) %>%
       summarise(
@@ -251,7 +237,7 @@ server <- function(input, output, session) {
       summarise(
         `org2 occurrence` = n(),
         dois = list(unique(doi)),
-       # titles = list(unique(title)),
+        titles = list(unique(title)),
         .groups = 'drop'
       )
     
@@ -384,10 +370,11 @@ server <- function(input, output, session) {
         data() %>%
           filter(!is.na(org2) & org2 != "" & !str_detect(org2, "^\\s*$")) %>%
           filter(grepl(search_term, orcid1, ignore.case = TRUE)) %>%
-          select(doi) %>%
+          select(doi, title) %>%
           distinct() %>%
-          filter(!is.na(doi)) %>%
-          rename(DOI = doi)
+          filter(!is.na(doi) & !is.na(title)) %>%
+          rename(DOI = doi, 
+                 Title = title)
       })
 
 
