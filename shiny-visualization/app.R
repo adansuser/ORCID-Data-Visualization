@@ -26,11 +26,11 @@ library(stringr)
 library(tidyr)
 
 # Custom variables for file paths, organization, and dates
-setwd("ENTER YOUR WORKING DIRECTORY HERE")  
-file_path <- "ENTER YOUR FILE PATH HERE"    
-organization_name <- "ENTER YOUR ORGANIZATION NAME HERE"  
-start_date <- "ENTER START DATE HERE"        
-update_date <- "ENTER UPDATE DATE HERE"       
+#setwd("ENTER YOUR WORKING DIRECTORY HERE")  
+file_path <- "../data/orcid_data_latlng.csv"    
+organization_name <- "Mount Allison University"  
+start_date <- "2018"        
+update_date <- "2025"       
 
 
 # Generate subtitle panel for displaying dates
@@ -193,8 +193,8 @@ server <- function(input, output, session) {
         axis.line = element_line(color = "white"),
         axis.ticks = element_blank(),
         # make text bigger
-        axis.text = element_text(size = 15),
-        axis.title = element_text(size = 16)
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 13)
       ) +
       ylab("Number of article collaborations") +
       coord_flip()
@@ -205,7 +205,8 @@ server <- function(input, output, session) {
         xaxis = list(title = "",
                      tickmode = "linear",
                      tick0 = 0,
-                     dtick = 1),
+                     dtick = 1,
+                     autorange = 2),
         margin = list(l = 120)  # Adjust left margin for longer y-axis labels
       )
   })
@@ -373,10 +374,14 @@ server <- function(input, output, session) {
           select(doi, title) %>%
           distinct() %>%
           filter(!is.na(doi) & !is.na(title)) %>%
-          rename(DOI = doi, 
-                 Title = title)
-      })
-
+        rename(DOI = doi,
+               Title = title) %>%
+          #this make the doi a clickable link
+          mutate(
+            DOI = paste0(
+              "<a href='https://doi.org/", DOI,"'target='_blank'>", DOI, "</a>"
+      ))
+})
 
       # Render article-level table
       output$articleTable <- renderDataTable({
@@ -389,7 +394,8 @@ server <- function(input, output, session) {
             scrollCollapse = TRUE,
             paging = FALSE
           ),
-          rownames = FALSE
+          rownames = FALSE, 
+          escape = FALSE
         )
       })
     ######################### END SEARCH FOR OWN COLLABS ###########################
