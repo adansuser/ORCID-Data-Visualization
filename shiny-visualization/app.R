@@ -373,8 +373,15 @@ server <- function(input, output, session) {
           select(doi, title) %>%
           distinct() %>%
           filter(!is.na(doi) & !is.na(title)) %>%
-          rename(DOI = doi, 
-                 Title = title)
+        rename(DOI = doi,
+               Title = title) %>%
+          #this make the doi a clickable link
+          mutate(
+            DOI = paste0(
+              "<a href='https://doi.org/", DOI,
+              "' target='_blank'>", DOI, "</a>"
+            )
+          )
       })
 
 
@@ -389,7 +396,8 @@ server <- function(input, output, session) {
             scrollCollapse = TRUE,
             paging = FALSE
           ),
-          rownames = FALSE
+          rownames = FALSE,
+          escape = FALSE
         )
       })
     ######################### END SEARCH FOR OWN COLLABS ###########################

@@ -59,28 +59,28 @@ library(geonames)
 # remove all objects from the environment to start with a clean slate
 #rm(list = ls())
 
-# # Set up orcid / crossref in R environment ------------------------------------------------------------
+# Set up orcid / crossref in R environment ------------------------------------------------------------
 # 
-# # if you've already done these steps and set up your bearer token in RStudio
-# # you can skip to the next section: "set some variables"
+# if you've already done these steps and set up your bearer token in RStudio
+# you can skip to the next section: "set some variables"
 # 
-# # 1. If you haven’t done so already, create an ORCID account at https://orcid.org/signin.
-# # 2. In the upper right corner, click your name, then in the drop-down menu, click Developer Tools. Note: In order to access Developer Tools, you must verify your email address.
-# # 3. If you have not already verified your email address, you will be prompted to do so at this point.
-# # 4. Click the “Register for the free ORCID public API” button
-# # 5. Review and agree to the terms of service when prompted.
-# # 6. Add your name in the Name field, https://www.orcid.org in the Your Website URL field, “Getting public API key” in Description field, and https://www.orcid.org in the redirect URI field. Click the diskette button to save.
-# # 7. A gray box will appear including your Client ID and Client Secret. In the below code chunk, copy and paste the client ID and the client secret respectively.
-# # 8. Make sure to leave the quotation marks (e.g. orcid_client_id <- "APP-FDFJKDSLF320SDFF" and orcid_client_secret <- "c8e987sa-0b9c-82ed-91as-1112b24234e").
+# 1. If you haven’t done so already, create an ORCID account at https://orcid.org/signin.
+# 2. In the upper right corner, click your name, then in the drop-down menu, click Developer Tools. Note: In order to access Developer Tools, you must verify your email address.
+# 3. If you have not already verified your email address, you will be prompted to do so at this point.
+# 4. Click the “Register for the free ORCID public API” button
+# 5. Review and agree to the terms of service when prompted.
+# 6. Add your name in the Name field, https://www.orcid.org in the Your Website URL field, “Getting public API key” in Description field, and https://www.orcid.org in the redirect URI field. Click the diskette button to save.
+# 7. A gray box will appear including your Client ID and Client Secret. In the below code chunk, copy and paste the client ID and the client secret respectively.
+# 8. Make sure to leave the quotation marks (e.g. orcid_client_id <- "APP-FDFJKDSLF320SDFF" and orcid_client_secret <- "c8e987sa-0b9c-82ed-91as-1112b24234e").
 # 
-# # copy/paste your client ID from https://orcid.org/developer-tools
-# #orcid_client_id <- "PASTE MY CLIENT ID HERE"
+# copy/paste your client ID from https://orcid.org/developer-tools
+#orcid_client_id <- "PASTE MY CLIENT ID HERE"
 # 
-# # copy/paste your client secret from https://orcid.org/developer-tools
-# #orcid_client_secret <- "PASTE MY CLIENT SECRET HERE"
+# copy/paste your client secret from https://orcid.org/developer-tools
+#orcid_client_secret <- "PASTE MY CLIENT SECRET HERE"
 # 
-# # This gets a /read-public scope access token
-# #orcid_request <- POST(url  = "https://orcid.org/oauth/token",
+# This gets a /read-public scope access token
+#orcid_request <- POST(url  = "https://orcid.org/oauth/token",
 #                       config = add_headers(`Accept` = "application/json",
 #                                            `Content-Type` = "application/x-www-form-urlencoded"),
 #                       body = list(grant_type = "client_credentials",
@@ -89,34 +89,34 @@ library(geonames)
 #                                   client_secret = orcid_client_secret),
 #                       encode = "form")
 # 
-# # parse the API request with content
+# parse the API request with content
 # orcid_response <- content(orcid_request)
 # 
-# # run the following code
+# run the following code
 # print(orcid_response$access_token)
 # 
-# #You will see a string of text print out in your R console.
-# # Copy that string to the clipboard
-# # so we can  save the token to our R environment
-# # Run this code:
+#You will see a string of text print out in your R console.
+# Copy that string to the clipboard
+# so we can  save the token to our R environment
+# Run this code:
 # usethis::edit_r_environ()
 # 
 # # A new window will open in RStudio.
-# # In this separate R environment page, type the following (except the pound sign):
-# # ORCID_TOKEN="my-token"
-# # replace 'my-token' with the access_token you just copied.
-# # Then press enter to create a new line.
-# # while we are here, we'll add in our rcrossref credentials
-# # type crossref_email="name@example.com", using your own email address.
-# # press enter to create a new line, and leave it blank.
-# # Press Ctrl + S (Mac: Cmd + S) to save this information to your R environment and close the window.
-# # You won't see anything happen here because it is just saving the page.
+# In this separate R environment page, type the following (except the pound sign):
+# ORCID_TOKEN="my-token"
+# replace 'my-token' with the access_token you just copied.
+# Then press enter to create a new line.
+# while we are here, we'll add in our rcrossref credentials
+# type crossref_email="name@example.com", using your own email address.
+# press enter to create a new line, and leave it blank.
+# Press Ctrl + S (Mac: Cmd + S) to save this information to your R environment and close the window.
+# You won't see anything happen here because it is just saving the page.
 # 
-# # Click Session > Restart R. Your token should now be saved to your R environment.
+# Click Session > Restart R. Your token should now be saved to your R environment.
 # 
-# # You will now need to rerun all the packages ("library()" commands) above, then return to this line.
+# You will now need to rerun all the packages ("library()" commands) above, then return to this line.
 # 
-# #You can confirm this worked by calling orcid_auth(), and it will print the token
+#You can confirm this worked by calling orcid_auth(), and it will print the token
 # rorcid::orcid_auth()
 
 # set some variables   ----------------------------------------------------------------------------
@@ -128,35 +128,35 @@ library(geonames)
 # set the time period of interest: this script will compile collaboration data since Jan 1 of this year.
 # replace the YYYY with a 4 digit year.
 # the more years of data desired, the longer some portions of this script will take to run
-my_year = 2021;
+# my_year = 2021;
 
 # set the home institution identifiers
-ringgold_id <- "7017" 
-grid_id <- "grid.260288.6" 
-ror_id <- "https://ror.org/03grc6f14"
+#ringgold_id <- "7017" 
+#grid_id <- "grid.260288.6" 
+#ror_id <- "https://ror.org/03grc6f14"
 # leave the @ off the email domain, if you want to catch subdomains (e.g. @tuj.temple.edu)
-email_domain <- "@mta.ca" 
-organization_name <- "Mount Allison University"
+#email_domain <- "@mta.ca" 
+#organization_name <- "Mount Allison University"
 
 # Set a short name key word here that you will use to filter for ORCID records from the home institution later
 # Keep it short, like the state name (e.g. Oklahoma). (For Temple University, used "Temple")
 # If you are adding more than one keyword, separate them by a pipe (|)
-my_org_keyword = "Mount Allison University"
+#my_org_keyword = "Mount Allison University"
 
 # set the institution's main location information (for use when precise location info is blank)
-anchor_org<-"Mount Allison University"
-anchor_city<-"Sackville"
-anchor_region<-"New Brunswick"
-anchor_country<-"Canada"
+#anchor_org<-"Mount Allison University"
+#anchor_city<-"Sackville"
+#anchor_region<-"New Brunswick"
+#anchor_country<-"Canada"
 
 # set up GeoNames in R Environment ------------------------------------------------------------
 
 # define GeoNames username and use the institution's location information for geocoding.
 # these variables will be used to derive latitude and longitude.
 # ensure free web services are enabled for your account, go here to enable [(https://www.geonames.org/manageaccount)]
-options(geonamesUsername = "estregger")
-home_city <- anchor_city
-home_country <- anchor_country
+#options(geonamesUsername = "estregger")
+#home_city <- anchor_city
+#home_country <- anchor_country
 
 # build the query   ----------------------------------------------------------------------------
 

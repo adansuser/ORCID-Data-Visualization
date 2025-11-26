@@ -1,0 +1,60 @@
+---
+title: "ORCID_basic"
+format: html
+editor: visual
+---
+
+# ORCID Data Visualization - Basic
+
+## Set variables
+
+### Organization identifiers for use in ORCID API
+
+add info on getting identifiers
+
+```{r organization ids}
+ringgold_id <- "7017" 
+grid_id <- "grid.260288.6" 
+ror_id <- "https://ror.org/03grc6f14"
+# instructions on formatting email domain
+email_domain <- "@mta.ca" 
+organization_name <- "Mount Allison University"
+```
+
+### Location information for geonames web services and map creation
+
+add info on setting up Geonames and enabling web services
+
+```{r}
+options(geonamesUsername = "estregger")
+anchor_org<-"Mount Allison University"
+anchor_city<-"Sackville"
+anchor_region<-"New Brunswick"
+anchor_country<-"Canada"
+home_city <- anchor_city
+home_country <- anchor_country
+
+```
+
+### Set filters used in code file
+
+```{r set filters}
+# set start year in YYYY format
+my_year = 2018
+# set organization keyword for filtering possible matches
+my_org_keyword = "Mount Allison"
+```
+
+## Run code file 
+
+add info on changing default options
+
+add info on data cleaning
+
+add estimated run time
+
+Expect warnings
+
+```{r run Rorcid Crossref Authors}
+source("./Rorcid_Crossref_Authors.R")
+```
