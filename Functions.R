@@ -1,0 +1,88 @@
+rorcid_packages <- function() {
+  install.packages('dplyr')
+  install.packages('tibble')
+  install.packages('tidyr')
+  install.packages('purrr')
+  install.packages('readr')
+  install.packages('stringr')
+  install.packages('jsonlite')
+  install.packages('lubridate')
+  install.packages('ggplot2')
+  install.packages('httr')
+  install.packages('forcats')
+  install.packages('rorcid')
+  install.packages('usethis')
+  install.packages('anytime')
+  install.packages('janitor')
+  install.packages('glue')
+  install.packages('remotes')
+  remotes::install_github("ropensci/rcrossref")
+  install.packages('roadoi')
+  install.packages('inops')
+  install.packages("rdatacite")
+  install.packages("data.table")
+  
+  library(dplyr)
+  library(tibble)
+  library(tidyr)
+  library(purrr)
+  library(readr)
+  library(stringr)
+  library(jsonlite)
+  library(lubridate)
+  library(ggplot2)
+  library(httr)
+  library(forcats)
+  library(usethis)
+  library(anytime)
+  library(janitor)
+  library(glue)
+  library(rorcid)
+  library(rcrossref)
+  library(roadoi)
+  library(inops)
+  library(rdatacite)
+  library(data.table)
+  library(geonames)
+}
+
+shiny_function <- function(){
+  install.packages("shiny")  
+  install.packages("readr") 
+  install.packages("dplyr")  
+  install.packages("ggplot2")
+  install.packages("bslib")  
+  install.packages("bsicons")  
+  install.packages("plotly")   
+  install.packages("leaflet") 
+  install.packages("htmltools") 
+  install.packages("DT")      
+  install.packages("stringr") 
+  install.packages("tidyr")    
+  
+  library(shiny)
+  library(readr)
+  library(dplyr)
+  library(ggplot2)
+  library(bslib)
+  library(bsicons)
+  library(plotly)
+  library(leaflet)
+  library(htmltools)
+  library(DT)
+  library(stringr)
+  library(tidyr)
+}
+accessToken <- function() {
+  orcidRequest <- POST(url  = "https://orcid.org/oauth/token",
+                       config = add_headers(`Accept` = "application/json",
+                                            `Content-Type` = "application/x-www-form-urlencoded"),
+                       body = list(grant_type = "client_credentials",
+                                   scope = "/read-public",
+                                   client_Id = orcidClientId,
+                                   client_secret = orcidClientSecret),
+                       encode = "form")
+  orcidResponse <- content(orcidRequest)
+  print(orcidResponse$accessToken)
+  usethis::edit_r_environ()
+}
