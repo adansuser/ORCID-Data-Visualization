@@ -1,0 +1,111 @@
+---
+title: "Rorcid_Crossref_Authors_Existing_List"
+format: html
+editor: visual
+---
+
+Rorcid_Crossref_Authors_Existing_List
+
+File introductions
+
+Script by Olivia Given Castello, adapted by Sheila Rabun, with contributions from Isabela Souza Cefrin
+
+based on: https://ciakovx.github.io/rorcid.html and 04-rcrossref_metadata.R at https://github.com/ciakovx/fsci2022/tree/main/code
+
+Purpose
+
+Retrieves ORCID profile and Crossref metadata for authors from an existing list of ORCID iDs, since a given year, paired with that of the co-authors with whom they collaborated.
+
+Running Code
+
+First to note: Many of the following blocks of code rely on functions made in the Functions.R file. As thus the 1st step, run the Functions.R file by clicking on the run button at the top right of the document and selecting run all.
+
+Install and load packages/libraries
+
+You will need to install packages first, using the following:
+
+The following code installs the same packages and libraries as installed in rorcid_Crossreg_Authors.R which uses Functions.R, specifically the package_and_libraries() function, if you've already run either of these files successfully, installing the packages, skip this step
+
+{r}
+{package_and_libraries()}
+
+Resets the environment to start clean:
+
+{r}
+{rm(list = ls())}
+
+---------------Set up orcid / crossref in R environment --------------
+
+>>> First step: RUN THE "Function.R" FILE <<<
+
+Creating Variables
+
+{r}
+myYear = YYYY
+
+ringgoldID <- "enter your institution's ringgold" 
+gridID <- "enter your institution's grid ID" 
+rorID <- "enter your institution's ROR ID"
+# leave the @ off the email domain, if you want to catch subdomains (e.g. @tuj.temple.edu)
+emailDomain <- "enter your institution's email domain" 
+organizationName <- "enter your organization's name"
+
+anchorOrg<-"Organization Name"
+anchorCity<-"City"
+anchorRegion<-"State"
+anchorCountry<-"Country"
+
+Variable List
+
+                                                             Institutions variables
+
+Your variables (variables specifically connected to you):
+
+myYear
+
+-   Set the time period of interest: this script will compile collaboration data since Jan 1 of this year.
+
+-   replace the YYYY with a 4 digit year
+
+-   the more years of data desired, the longer some portions of this script will take to run
+
+Institution Identifiers
+
+Main institution location
+
+set the institution's main location information (for use when precise location info is blank)
+
+example
+
+anchorOrg<-"The Gordon and Betty Moore Foundation"
+
+anchorCity<-"Palo Alto"
+
+anchorRegion<-"CA"
+
+anchorCountry<-"US"
+
+Unnecessary variable?
+
+Requirements in the code have not been found, so use each when required
+
+Creating my /read-public scope access token
+
+Use when required
+
+{r}
+accessToken()
+rorcid::orcid_auth()
+
+SETTING WORKING DIRECTORY
+
+set the working directory where this script is a folder called "data" is also expected to be in this directory
+
+example: workDirector("C:/Users/rabun/OneDrive - LYRASIS/Documents/RsearchResults")
+
+{r}
+#Setting Working Directory
+workDirector("PASTE WORKING DIRECTORY HERE")
+
+Unnecessary variable?
+
