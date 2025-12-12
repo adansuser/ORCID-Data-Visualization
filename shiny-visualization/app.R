@@ -1,29 +1,4 @@
-# Install required packages (uncomment to install)
-# install.packages("shiny")  
-# install.packages("readr") 
-# install.packages("dplyr")  
-# install.packages("ggplot2")
-# install.packages("bslib")  
-# install.packages("bsicons")  
-# install.packages("plotly")   
-# install.packages("leaflet") 
-# install.packages("htmltools") 
-# install.packages("DT")      
-# install.packages("stringr") 
-# install.packages("tidyr")    
 
-library(shiny)
-library(readr)
-library(dplyr)
-library(ggplot2)
-library(bslib)
-library(bsicons)
-library(plotly)
-library(leaflet)
-library(htmltools)
-library(DT)
-library(stringr)
-library(tidyr)
 
 # Custom variables for file paths, organization, and dates
 setwd("ENTER YOUR WORKING DIRECTORY HERE")  
@@ -42,7 +17,7 @@ generateSubtitlePanel <- function(org_name = organization_name, start = start_da
 }
 
 # Generate title panel for the UI
-generateTitlePanel <- function(org_name = organization_name, start = start_date, end = update_date) {
+generateTitlePanel <- frunction(org_name = organization_name, start = start_date, end = update_date) {
   tagList(
     titlePanel(paste(organization_name, " (", start, " - ", end, ")", sep = "")),
     div(
@@ -91,8 +66,8 @@ ui <- page_navbar(
                               paste("Excluding", organization_name)),
                   selected = "Show All"),
       fluidRow(
-        column(6, textInput("search_institution", "Search for an institution:", "", width='100%')),
-        column(6, textInput("search_article", "Search for a DOI:", "", width='100%'))
+        column(6, textInput("searchInstitution", "Search for an institution:", "", width='100%')),
+        column(6, textInput("searchArticle", "Search for a DOI:", "", width='100%'))
       ),
       leafletOutput("map")
     ),
@@ -214,11 +189,11 @@ server <- function(input, output, session) {
   
   ################## MAP Data and Functions ####################################
   # Reactive function for processing (and filtering) institution data
-  process_institution_data <- reactive({
+  processInstitutionData <- reactive({
     req(data())
     
     # Get unique locations with their associated organizations
-    unique_institutions <- data() %>%
+    uniqueInstitutions <- data() %>%
       select(org2, city2, region2, country2, lat2, lng2, title) %>%
       filter(!is.na(lat2) & !is.na(lng2)) %>%
       group_by(lat2, lng2) %>%
@@ -231,7 +206,7 @@ server <- function(input, output, session) {
       )
     
     # Count institutions and create list of DOIs by location
-    institutions_count_and_dois <- data() %>%
+    institutionsCountAndDois <- data() %>%
       filter(!is.na(lat2) & !is.na(lng2)) %>%
       group_by(lat2, lng2) %>%
       summarise(
@@ -242,14 +217,14 @@ server <- function(input, output, session) {
       )
     
     # Join data using latitude and longitude
-    filtered_institutions_info <- left_join(
-      unique_institutions, 
-      institutions_count_and_dois,
+    filteredInstitutionsInfo <- left_join(
+      uniqueInstitutions, 
+      institutionsCountAndDois,
       by = c("lat2", "lng2")) %>% 
       arrange(org2)
     
     # Add content for popups
-    filtered_institutions_info <- filtered_institutions_info %>%
+    filteredInstitutionsInfo <- filteredInstitutionsInfo %>%
       mutate(cntnt = paste0('<strong>Institution:</strong> ', org2,
                             '<br><strong>Number of article collaborations: </strong>', `org2 occurrence`,
                             '<br><strong>Location:</strong> ', city2, ', ', region2,
@@ -258,33 +233,33 @@ server <- function(input, output, session) {
     # Apply filters based on user input
     if (!is.null(input$institution_filter)) {
       if (input$institution_filter == organization_name) {
-        filtered_institutions_info <- filtered_institutions_info %>%
+        filteredInstitutionsInfo <- filteredInstitutionsInfo %>%
           filter(str_detect(org2, regex(organization_name, ignore_case = TRUE)))
       } else if (input$institution_filter == paste("Excluding", organization_name)) {
-        filtered_institutions_info <- filtered_institutions_info %>%
+        filteredInstitutionsInfo <- filteredInstitutionsInfo %>%
           filter(!str_detect(org2, regex(organization_name, ignore_case = TRUE)))
       }
     }
     
     # Apply institution search filter
-    if (!is.null(input$search_institution) && input$search_institution != "") {
-      filtered_institutions_info <- filtered_institutions_info %>%
-        filter(str_detect(org2, regex(input$search_institution, ignore_case = TRUE)))
+    if (!is.null(input$searchInstitution) && input$searchInstitution != "") {
+      filteredInstitutionsInfo <- filteredInstitutionsInfo %>%
+        filter(str_detect(org2, regex(input$searchInstitution, ignore_case = TRUE)))
     }
     
     # Apply article (DOI) search filter
-    if (!is.null(input$search_article) && input$search_article != "") {
-      filtered_institutions_info <- filtered_institutions_info %>%
-        filter(sapply(dois, function(x) any(str_detect(x, regex(input$search_article, ignore_case = TRUE)))))
+    if (!is.null(input$searchArticle) && input$searchArticle != "") {
+      filteredInstitutionsInfo <- filteredInstitutionsInfo %>%
+        filter(sapply(dois, function(x) any(str_detect(x, regex(input$searchArticle, ignore_case = TRUE)))))
     }
 
-    filtered_institutions_info
+    filteredInstitutionsInfo
   })
   
   output$map <- renderLeaflet({
 
       # Filter data by institution if a selection is made
-      filtered_data <- process_institution_data()
+      filtered_data <- processInstitutionData()
 
       # Render map
       leaflet(data=filtered_data) %>%
@@ -309,7 +284,7 @@ server <- function(input, output, session) {
 
     output$institutionTable <- renderDataTable({
       # Apply the filtering logic based on the user's selection
-      filtered_data <- process_institution_data() %>%
+      filtered_data <- processInstitutionData() %>%
         select(org2, `org2 occurrence`) %>%
         rename(Institution = org2, 
                Collaborations = `org2 occurrence`)
@@ -330,7 +305,7 @@ server <- function(input, output, session) {
     
     ######################### SEARCH FOR OWN COLLABS ###########################
       # Reactive expression for institution-level data
-      collabs_data <- reactive({
+      collabsData <- reactive({
         req(data())
         search_term <- input$search
         data() %>%
@@ -350,7 +325,7 @@ server <- function(input, output, session) {
 
       output$collabTable <- renderDataTable({
         datatable(
-          collabs_data(),
+          collabsData(),
           options = list(
             dom = 'Bt',
             searching = FALSE,

@@ -26,12 +26,12 @@
 
 # options(geonamesUsername = "PASTE GEONAMES USERNAME HERE")
 
-# Update co_authors_full_info ------------------------------------------------
+# Update co_auth_full_info ------------------------------------------------
 
-# get unique city / region / country values from co_authors_full_info
-places <- unique(co_authors_full_info[c("city2", "region2", "country2")])
+# get unique city / region / country values from co_auth_full_info
+places <- unique(co_auth_full_info[c("city2", "region2", "country2")])
 places <- places[!apply(is.na(places) | places == "", 1, all),]
-places$uniqueid <- with(places, paste(city2,region2,country2))
+places$uniqueId <- with(places, paste(city2,region2,country2))
 places$lat <- ''
 places$lng <- ''
 
@@ -72,46 +72,46 @@ home_lanc_df <- GNsearch(name_equals = home_city, country = home_country)
 home_lanc_coords <- home_lanc_df[1, c("lng", "lat")]  
 
 # back up my dataframe
-co_authors_full_info_bck<-co_authors_full_info 
+co_auth_full_info_bck<-co_auth_full_info 
 
-# need to paste these lat longs back into co_authors_full_info
-# create a column for the unique place id on each co_author row
-co_authors_full_info$unique_place_id <- with(co_authors_full_info, paste(city2,region2,country2))
+# need to paste these lat longs back into co_auth_full_info
+# create a column for the unique place id on each co_auth row
+co_auth_full_info$unique_place_Id <- with(co_auth_full_info, paste(city2,region2,country2))
 
-# insert home author's latitude and longitude -- right now derived from one set home location
-co_authors_full_info<-add_column(co_authors_full_info, lat1 = home_lanc_coords$lat, .after = "country1")
-co_authors_full_info<-add_column(co_authors_full_info, lng1 = home_lanc_coords$lng, .after = "lat1")
+# insert home auth's latitude and longitude -- right now derived from one set home location
+co_auth_full_info<-add_col(co_auth_full_info, lat1 = home_lanc_coords$lat, .after = "country1")
+co_auth_full_info<-add_col(co_auth_full_info, lng1 = home_lanc_coords$lng, .after = "lat1")
 
-# create columns for the co-author lat lngs
-co_authors_full_info$lat2 <- NA
-co_authors_full_info$lng2 <- NA
+# create columns for the co-auth lat lngs
+co_auth_full_info$lat2 <- NA
+co_auth_full_info$lng2 <- NA
 
-# left join on unique place ID to get the lat and lng of the co-author filled in where possible
+# left join on unique place ID to get the lat and lng of the co-auth filled in where possible
 # be double sure that we have no exact duplicate place rows
 places <- places[!duplicated(places$uniqueid),]
 
-# for the co-authors that had location data and for whom we now have a lat lng, join that info into the co_authors df
-co_authors_full_info_latlng <- left_join(co_authors_full_info,places,by=c("unique_place_id" = "uniqueid"))
+# for the co-auth that had location data and for whom we now have a lat lng, join that info into the co_auth df
+co_auth_full_info_latlng <- left_join(co_auth_full_info,places,by=c("unique_place_id" = "uniqueid"))
 
 # IF lat2, lng2 are NA, fill from the joined table
 # fill in the joined location fields where location is blank
-co_authors_full_info_latlng <- co_authors_full_info_latlng %>% 
+co_auth_full_info_latlng <- co_auth_full_info_latlng %>% 
   mutate(lat2 = coalesce(lat2,lat),
          lng2 = coalesce(lng2,lng)
   )
 
 # get rid of NA values
-co_authors_full_info_latlng[is.na(co_authors_full_info_latlng)] <- ""
+co_auth_full_info_latlng[is.na(co_auth_full_info_latlng)] <- ""
 
 # remove some columns that are not needed
-co_authors_full_info_latlng <- subset(co_authors_full_info_latlng, select = -c(city2.y, region2.y, country2.y, lat, lng))
+co_auth_full_info_latlng <- subset(co_auth_full_info_latlng, select = -c(city2.y, region2.y, country2.y, lat, lng))
 
 #fix some column names and reorder 
-co_authors_full_info_latlng <- co_authors_full_info_latlng %>% 
+co_auth_full_info_latlng <- co_auth_full_info_latlng %>% 
   rename(
     city2 = city2.x,
     region2 = region2.x,
     country2 = country2.x,
   )
 
-write_csv(co_authors_full_info_latlng, "./data/orcid_data_latlng.csv")
+write_csv(co_auth_full_info_latlng, "./data/orcid_data_latlng.csv")
